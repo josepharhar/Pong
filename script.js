@@ -48,7 +48,7 @@ function Paddle(x1, x2, y1, y2){
 	this.returnTrajectory = function(ball){
 		var center = (this.x1 + this.x2) / 2;
 		var ballcenter = (ball.x1 + ball.x2) / 2;
-		var maxDifference = (ball.x1 + ball.x2 + this.x1 + this.x2) / 2;
+		var maxDifference = (this.x2 - this.x1) / 2;
 		var difference = center - ballcenter;
 
 		//ratio to get multiplied by 90 degrees to get new direction
@@ -89,6 +89,8 @@ function Paddle(x1, x2, y1, y2){
 };
 
 function tick(){
+
+	
 	//move the ball and check for collision with both paddles
 	ball.move();
 	if (player1.isColliding(ball)){
@@ -96,14 +98,33 @@ function tick(){
 	} else if (player2.isColliding(ball)){
 		player2.returnTrajectory(ball);
 	}
-	
+
 	//refresh graphics
 	refreshCanvas();
+	
 };
+
+function paint(){
+	//player 1
+	canvas.fillStyle = 'red';
+	canvas.fillRect(player1.x1,player1.y1,(player1.x2-player1.x1),(player1.y2-player1.y1));
+	
+	//player 2
+	canvas.fillStyle = 'blue';
+	canvas.fillRect(player2.x1,player2.y1,(player2.x2-player2.x1),(player2.y2-player2.y1));
+	
+	//ball
+	canvas.beginPath();
+	//(centerX, centerY, radius, 0, arc length, false)
+	canvas.arc((ball.x2-ball.x1)/2, (ball.y2-ball.y1)/2, 5, 0, 2 * Math.PI, false);
+	canvas.fillStyle = 'black';
+	canvas.fill();
+}
 
 function refreshCanvas(){
 	canvas.fillStyle = 'White';
-	canvas.fillRect(0,0,)
+	canvas.fillRect(0,0,width,height);
+	paint();
 };
 
 $(document).keydown(function(e){
