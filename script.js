@@ -94,15 +94,10 @@ function tick(){
 
 	
 	//move the ball and check for collision with both paddles
-	ball.move();
-	if (player1.isColliding(ball)){
-		player1.returnTrajectory(ball);
-	} else if (player2.isColliding(ball)){
-		player2.returnTrajectory(ball);
-	}
-
+	
+if(typeof game_loop != "undefined") clearInterval(game_loop);
+		game_loop = setInterval(refreshCanvas, 60);
 	//refresh graphics
-	refreshCanvas();
 	
 };
 
@@ -124,6 +119,14 @@ function paint(){
 };
 
 function refreshCanvas(){
+	
+	ball.move();
+	if (player1.isColliding(ball)){
+		player1.returnTrajectory(ball);
+	} else if (player2.isColliding(ball)){
+		player2.returnTrajectory(ball);
+	}
+	
 	canvas.fillStyle = 'White';
 	canvas.fillRect(0,0,width,height);
 	paint();
