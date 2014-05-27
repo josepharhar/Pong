@@ -5,7 +5,7 @@ var width = $('#gameCanvas').width();
 var height = $('#gameCanvas').height();
 
 //creates the ball
-var ball = new Ball(width/2,height/2, 1);
+var ball = new Ball(width/2,height/2, 2);
 
 //creates two new players at opposing sides of the field
 var player1 = new Paddle(0, 10, height/2 - 30, height/2 + 30);
@@ -37,10 +37,17 @@ function Paddle(x1, x2, y1, y2){
 	this.y1 = y1;
 	this.y2 = y2;
 	this.isColliding = function(ball){
-		return !(ball.X > this.x2 &&
-			 ball.X < this.x1 &&
-		 	 ball.Y > this.y2 &&
-			 ball.Y < this.y1);
+		if (ball.direction%(Math.PI*2) < (Math.PI/2)) {
+			return ((ball.X+5) > this.x1 &&
+		 		ball.Y < this.y2 &&
+				ball.Y > this.y1);
+		}
+		else {
+			return ((ball.X-5) < this.x2 &&
+		 		ball.Y < this.y2 &&
+				ball.Y > this.y1);
+		};
+		
 	};
 	//changes the direction of the ball during collision
 	this.returnTrajectory = function(ball){
@@ -92,7 +99,7 @@ function tick(){
 	//move the ball and check for collision with both paddles
 	
 if(typeof game_loop != "undefined") clearInterval(game_loop);
-		game_loop = setInterval(refreshCanvas, 60);
+		game_loop = setInterval(refreshCanvas, 15);
 	//refresh graphics
 	
 };
@@ -119,11 +126,20 @@ function paint(){
 function refreshCanvas(){
 	
 	ball.move();
-	if (player1.isColliding(ball)){
-		player1.returnTrajectory(ball);
-	} else if (player2.isColliding(ball)){
-		player2.returnTrajectory(ball);
+	// if ball is moving right
+	if ((ball.direction+(Math.PI/2))%(Math.PI*2) < (Math.PI)) {
+		if (player2.isColliding(ball)){
+			player2.returnTrajectory(ball);
+		}
 	}
+	else {
+		if (player1.isColliding(ball)){
+			player1.returnTrajectory(ball);
+		}
+	}
+
+
+	
 	
 	canvas.fillStyle = 'White';
 	canvas.fillRect(0,0,width,height);
@@ -136,7 +152,7 @@ $(document).keydown(function(e){
 	switch(e.which){
 		case 38:
 			//arrow key up
-			player1.
+			
 			break;
 		case 40:
 			//arrow key down
