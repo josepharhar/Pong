@@ -49,6 +49,37 @@ function Paddle(x1, x2, y1, y2){
 		//ratio to get multiplied by 90 degrees to get new direction
 		var ratio = difference / maxDifference;
 
+		//if ratio is negative, then the ball will be going down
+		//if the ball is going right, then it will go left
+
+		var newDirection;
+
+		if (ball.direction >= 0 && ball.direction < Math.PI / 2){
+			//quadrant 1
+			//going right, now needs to go left
+			newDirection = 'left';
+		} else if (ball.direction < Math.PI){
+			//quadrant 2
+			//going left, now needs to go right
+			newDirection = 'right';
+		} else if (ball.direction < Math.PI * 3 / 2){
+			//quadrant 3
+			//going left, now needs to go right
+			newDirection = 'right';
+		} else {
+			//quadrant 4
+			//going right, now needs to go left
+			newDirection = 'left';
+		}
+		
+		//Math.PI / 2 * ratio
+
+		if (newDirection === 'right') {
+
+		} else if (newDirection === 'left') {
+
+		}
+
 	};
 };
 
