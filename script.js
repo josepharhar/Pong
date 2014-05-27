@@ -5,18 +5,16 @@ var width = $('#gameCanvas').width();
 var height = $('#gameCanvas').height();
 
 //creates the ball
-var ball = new Ball();
+var ball = new Ball(width/2,height/2, 1);
 
 //creates two new players at opposing sides of the field
 var player1 = new Paddle(0, 10, height/2 - 30, height/2 + 30);
 var player2 = new Paddle(width-10, width, height/2 - 30, height/2 + 30);
 
 //ball object that gets hit around the board by the paddles with hitbox
-function Ball(x1, x2, y1, y2, speed){
-	this.x1 = x1;
-	this.x2 = x2;
-	this.y1 = y1;
-	this.y2 = y2;
+function Ball(centerX, centerY, speed){
+	this.X = centerX;
+	this.Y = centerY;
 	this.speed = speed;
 	this.direction = Math.PI; //represents direction the ball is traveling in radians
 	this.setDirection = function(direction){
@@ -26,10 +24,8 @@ function Ball(x1, x2, y1, y2, speed){
 	this.move = function(){
 		var dx = this.speed * Math.cos(this.direction);
 		var dy = this.speed * Math.sin(this.direction);
-		this.x1 += dx;
-		this.x2 += dx;
-		this.y1 += dy;
-		this.y2 += dy;
+		this.X += dx;
+		this.Y += dy;
 	};
 };
 
@@ -41,16 +37,16 @@ function Paddle(x1, x2, y1, y2){
 	this.y1 = y1;
 	this.y2 = y2;
 	this.isColliding = function(ball){
-		return !(ball.x1 > this.x2 ||
-				 ball.x2 < this.x1 ||
-				 ball.y1 > this.y2 ||
-				 ball.y2 < this.y1);
+		return !(ball.X > this.x2 &&
+			 ball.X < this.x1 &&
+		 	 ball.Y > this.y2 &&
+			 ball.Y < this.y1);
 	};
 	//changes the direction of the ball during collision
 	this.returnTrajectory = function(ball){
-		var center = (this.x1 + this.x2) / 2;
-		var ballcenter = (ball.x1 + ball.x2) / 2;
-		var maxDifference = (this.x2 - this.x1) / 2;
+		var center = (this.y1 + this.y2) / 2;
+		var ballcenter = ball.Y;
+		var maxDifference = (this.y2 - this.y1) / 2;
 		var difference = center - ballcenter;
 
 		//ratio to get multiplied by 90 degrees to get new direction
@@ -115,7 +111,7 @@ function paint(){
 	//ball
 	canvas.beginPath();
 	//(centerX, centerY, radius, 0, arc length, false)
-	canvas.arc(((ball.x2-ball.x1)/2), ((ball.y2-ball.y1)/2), 5, 0, 2 * Math.PI, false);
+	canvas.arc(ball.X, ball.Y, 5, 0, 2 * Math.PI, false);
 	canvas.fillStyle = 'black';
 	canvas.fill();
 };
@@ -140,7 +136,7 @@ $(document).keydown(function(e){
 	switch(e.which){
 		case 38:
 			//arrow key up
-
+			player1.
 			break;
 		case 40:
 			//arrow key down
