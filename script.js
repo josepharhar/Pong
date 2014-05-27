@@ -5,7 +5,7 @@ var width = $('#gameCanvas').width();
 var height = $('#gameCanvas').height();
 
 //creates the ball
-var ball = new Ball(width/2,height/2, 2);
+var ball = new Ball(width/2,height/2, 3);
 
 //creates two new players at opposing sides of the field
 var player1 = new Paddle(0, 10, height/2 - 30, height/2 + 30);
@@ -99,7 +99,7 @@ function tick(){
 	//move the ball and check for collision with both paddles
 	
 if(typeof game_loop != "undefined") clearInterval(game_loop);
-		game_loop = setInterval(refreshCanvas, 15);
+		game_loop = setInterval(refreshCanvas, 25);
 	//refresh graphics
 	
 };
@@ -130,11 +130,13 @@ function refreshCanvas(){
 	if ((ball.direction+(Math.PI/2))%(Math.PI*2) < (Math.PI)) {
 		if (player2.isColliding(ball)){
 			player2.returnTrajectory(ball);
+			ball.speed+=1;
 		}
 	}
 	else {
 		if (player1.isColliding(ball)){
 			player1.returnTrajectory(ball);
+			ball.speed+=1;
 		}
 	}
 
@@ -150,13 +152,29 @@ function refreshCanvas(){
 $(document).keydown(function(e){
 	//switch statement to handle different keycodes
 	switch(e.which){
+		// w/s for player 1
+		// up/down for player 2
 		case 38:
 			//arrow key up
-			
+			player2.y1-=5;
+			player2.y2-=5;
 			break;
 		case 40:
 			//arrow key down
-
+			player2.y1+=5;
+			player2.y2+=5;
+			break;
+		case 119:
+			//w key up
+			player1.y1-=5;
+			player1.y2-=5;
+			break;
+		case 115:
+			//s key down
+			player1.y1+=5;
+			player1.y2+=5;
+			break;
+		default:
 			break;
 	}
 	
