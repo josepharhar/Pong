@@ -22,7 +22,12 @@ function Ball(x1, x2, y1, y2, speed){
 	};
 	//applies the speed and direction to the position
 	this.move = function(){
-
+		var dx = this.speed * Math.cos(direction);
+		var dy = this.speed * Math.sin(direction);
+		this.x1 += dx;
+		this.x2 += dx;
+		this.y1 += dy;
+		this.y2 += dy;
 	};
 };
 
@@ -75,17 +80,26 @@ function Paddle(x1, x2, y1, y2){
 		//Math.PI / 2 * ratio
 
 		if (newDirection === 'right') {
-
+			ball.setDirection((Math.PI / 2) * ratio);
 		} else if (newDirection === 'left') {
-
+			ball.setDirection(Math.PI + -1 * (Math.PI / 2) * ratio);
 		}
 
 	};
 };
 
 function tick(){
-
-}
+	//move the ball and check for collision with both paddles
+	ball.move();
+	if (player1.isColliding(ball)){
+		player1.returnTrajectory(ball);
+	} else if (player2.isColliding(ball)){
+		player2.returnTrajectory(ball);
+	}
+	
+	//refresh graphics
+	refreshCanvas();
+};
 
 function refreshCanvas(){
 	canvas.fillStyle = 'White';
