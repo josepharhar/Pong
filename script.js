@@ -1,13 +1,15 @@
+$(document).ready(function () {
+	
 var canvas = $('#gameCanvas')[0].getContext('2d');
 var width = $('#gameCanvas').width();
 var height = $('#gameCanvas').height();
 
 //creates the ball
-var ball = new Ball()
+var ball = new Ball();
 
 //creates two new players at opposing sides of the field
 var player1 = new Paddle(0,5, height/2 - 10, height/2 + 10);
-var player2 = new Paddle(width-5,width, height/2 - 10, height/2 + 10)
+var player2 = new Paddle(width-5,width, height/2 - 10, height/2 + 10);
 
 //ball object that gets hit around the board by the paddles with hitbox
 function Ball(x1, x2, y1, y2, speed){
@@ -119,7 +121,7 @@ function paint(){
 	canvas.arc((ball.x2-ball.x1)/2, (ball.y2-ball.y1)/2, 5, 0, 2 * Math.PI, false);
 	canvas.fillStyle = 'black';
 	canvas.fill();
-}
+};
 
 function refreshCanvas(){
 	canvas.fillStyle = 'White';
@@ -139,4 +141,9 @@ $(document).keydown(function(e){
 
 			break;
 	}
+	
+});
+
+
+
 });
