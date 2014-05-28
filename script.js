@@ -5,27 +5,59 @@ var width = $('#gameCanvas').width();
 var height = $('#gameCanvas').height();
 
 //creates the ball
-var ball = new Ball(width/2,height/2, 3);
+var ball = new Ball(width/2,height/2, 5, 3);
 
 //creates two new players at opposing sides of the field
 var player1 = new Paddle(0, 10, height/2 - 30, height/2 + 30);
 var player2 = new Paddle(width-10, width, height/2 - 30, height/2 + 30);
 
 //ball object that gets hit around the board by the paddles with hitbox
-function Ball(centerX, centerY, speed){
+function Ball(centerX, centerY, radius, speed){
 	this.X = centerX;
 	this.Y = centerY;
+	this.radius = radius;
 	this.speed = speed;
-	this.direction = Math.PI; //represents direction the ball is traveling in radians
+	this.direction = 0; //represents direction the ball is traveling in radians
 	this.setDirection = function(direction){
+		//todo: make this compatible with more than 2pi and less than zero
 		this.direction = direction;
 	};
 	//applies the speed and direction to the position
 	this.move = function(){
 		var dx = this.speed * Math.cos(this.direction);
 		var dy = this.speed * Math.sin(this.direction);
+
 		this.X += dx;
-		this.Y += dy;
+		this.Y -= dy; //subtract because graphics start at top left corner
+	};
+
+	//if the ball is moving to the right returns true, false for left
+	this.isRight = function() {
+		if (this.direction > 0 && this.direction < Math.PI / 2){
+			return true;
+		} else if (this.direction < Math.PI * 3 / 2){
+			return false;
+		} else {
+			return true;
+		}
+	};
+
+	//checks for collision with wall and chagnes direction as necessary
+	this.wallCollision = function(){
+
+		if (this.Y < 0){
+			//colliding with top wall
+			this.setDirection(2 * Math.PI - (this.direction % Math.PI));
+		} else if (this.Y > height){
+			//colliding with bottom
+			this.setDirection(Math.PI - (this.direction % Math.PI));
+		} else if (this.X < 0){
+			//colliding with left wall
+			//left player just lost
+		} else if (this.X > width){
+			//colliding with right wall
+			//right player just lost
+		}
 	};
 };
 
@@ -38,12 +70,12 @@ function Paddle(x1, x2, y1, y2){
 	this.y2 = y2;
 	this.isColliding = function(ball){
 		if (ball.direction%(Math.PI*2) < (Math.PI/2)) {
-			return ((ball.X+5) > this.x1 &&
+			return ((ball.X+ball.radius) > this.x1 &&
 		 		ball.Y < this.y2 &&
 				ball.Y > this.y1);
 		}
 		else {
-			return ((ball.X-5) < this.x2 &&
+			return ((ball.X-ball.radius) < this.x2 &&
 		 		ball.Y < this.y2 &&
 				ball.Y > this.y1);
 		};
@@ -118,7 +150,7 @@ function paint(){
 	//ball
 	canvas.beginPath();
 	//(centerX, centerY, radius, 0, arc length, false)
-	canvas.arc(ball.X, ball.Y, 5, 0, 2 * Math.PI, false);
+	canvas.arc(ball.X, ball.Y, ball.radius, 0, 2 * Math.PI, false);
 	canvas.fillStyle = 'black';
 	canvas.fill();
 };
@@ -139,6 +171,9 @@ function refreshCanvas(){
 			ball.speed+=1;
 		}
 	}
+
+	//checks for collision with walls
+	ball.wallCollision();
 
 
 	
@@ -164,12 +199,12 @@ $(document).keydown(function(e){
 			player2.y1+=5;
 			player2.y2+=5;
 			break;
-		case 119:
+		case 87:
 			//w key up
 			player1.y1-=5;
 			player1.y2-=5;
 			break;
-		case 115:
+		case 83:
 			//s key down
 			player1.y1+=5;
 			player1.y2+=5;
