@@ -53,7 +53,7 @@ function Paddle(x1, x2, y1, y2){
 	this.returnTrajectory = function(ball){
 		var center = (this.y1 + this.y2) / 2;
 		var ballcenter = ball.Y;
-		var maxDifference = (this.y2 - this.y1) / 2;
+		var maxDifference = (this.y2 - this.y1);
 		var difference = center - ballcenter;
 
 		//ratio to get multiplied by 90 degrees to get new direction
