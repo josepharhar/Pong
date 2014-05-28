@@ -11,6 +11,7 @@ var ball = new Ball(width/2,height/2, 5, 3);
 var player1 = new Paddle(0, 10, height/2 - 30, height/2 + 30);
 var player2 = new Paddle(width-10, width, height/2 - 30, height/2 + 30);
 
+
 //ball object that gets hit around the board by the paddles with hitbox
 function Ball(centerX, centerY, radius, speed){
 	this.X = centerX;
@@ -68,6 +69,7 @@ function Paddle(x1, x2, y1, y2){
 	this.x2 = x2;
 	this.y1 = y1;
 	this.y2 = y2;
+	this.moveArray = [];
 	this.isColliding = function(ball){
 		if (ball.direction%(Math.PI*2) < (Math.PI/2)) {
 			return ((ball.X+ball.radius) > this.x1 &&
@@ -121,7 +123,7 @@ function Paddle(x1, x2, y1, y2){
 		} else if (newDirection === 'left') {
 			ball.setDirection(Math.PI + -1 * (Math.PI / 2) * ratio);
 		}
-
+	
 	};
 };
 
@@ -165,6 +167,7 @@ function refreshCanvas(){
 			ball.speed+=1;
 		}
 	}
+	// if ball is moving left
 	else {
 		if (player1.isColliding(ball)){
 			player1.returnTrajectory(ball);
@@ -176,7 +179,35 @@ function refreshCanvas(){
 	ball.wallCollision();
 
 
-	
+	// paddle movement
+	for (var i in player1.moveArray){
+		switch(i){
+			case "u": 
+				player1.y1 -= 5;
+				player1.y2 -= 5;
+				break;
+			case "d":
+				player1.y1 += 5;
+				player1.y2 += 5;
+				break;
+			default:
+				break;
+		}
+	}
+	for (var i in player2.moveArray){
+		switch(i){
+			case "u": 
+				player2.y1 -= 5;
+				player2.y2 -= 5;
+				break;
+			case "d":
+				player2.y1 += 5;
+				player2.y2 += 5;
+				break;
+			default:
+				break;
+		}
+	}
 	
 	canvas.fillStyle = 'White';
 	canvas.fillRect(0,0,width,height);
@@ -191,23 +222,27 @@ $(document).keydown(function(e){
 		// up/down for player 2
 		case 38:
 			//arrow key up
-			player2.y1-=5;
-			player2.y2-=5;
+			//player2.y1-=5;
+			//player2.y2-=5;
+			player2.moveArray.push("u");
 			break;
 		case 40:
 			//arrow key down
-			player2.y1+=5;
-			player2.y2+=5;
+			//player2.y1+=5;
+			//player2.y2+=5;
+			player2.moveArray.push("d");
 			break;
 		case 87:
 			//w key up
-			player1.y1-=5;
-			player1.y2-=5;
+			//player1.y1-=5;
+			//player1.y2-=5;
+			player1.moveArray.push("u");
 			break;
 		case 83:
 			//s key down
-			player1.y1+=5;
-			player1.y2+=5;
+			//player1.y1+=5;
+			//player1.y2+=5;
+			player1.moveArray.push("d")
 			break;
 		default:
 			break;
@@ -215,6 +250,32 @@ $(document).keydown(function(e){
 	
 });
 
+$(document).keyup(function(e){
+	//switch statement to handle different keycodes
+	switch(e.which){
+		// w/s for player 1
+		// up/down for player 2
+		case 38:
+			//arrow key up
+			player2.moveArray.splice(player2.moveArray.indexOf("u"),1);
+			break;
+		case 40:
+			//arrow key down
+			player2.moveArray.splice(player2.moveArray.indexOf("d"),1);
+			break;
+		case 87:
+			//w key up
+			player1.moveArray.splice(player1.moveArray.indexOf("u"),1);
+			break;
+		case 83:
+			//s key down
+			player1.moveArray.splice(player1.moveArray.indexOf("d"),1);
+			break;
+		default:
+			break;
+	}
+	
+});
 
 
 });
