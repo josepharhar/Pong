@@ -181,7 +181,7 @@ function refreshCanvas(){
 
 	// paddle movement
 	for (var i in player1.moveArray){
-		switch(i){
+		switch(player1.moveArray[i]){
 			case "u": 
 				player1.y1 -= 5;
 				player1.y2 -= 5;
@@ -195,7 +195,7 @@ function refreshCanvas(){
 		}
 	}
 	for (var i in player2.moveArray){
-		switch(i){
+		switch(player2.moveArray[i]){
 			case "u": 
 				player2.y1 -= 5;
 				player2.y2 -= 5;
@@ -224,29 +224,33 @@ $(document).keydown(function(e){
 			//arrow key up
 			//player2.y1-=5;
 			//player2.y2-=5;
-			if (player2.moveArray.indexOf("u") != -1)
+			if (player2.moveArray.indexOf("u") == -1){
 			player2.moveArray.push("u");
+}
 			break;
 		case 40:
 			//arrow key down
 			//player2.y1+=5;
 			//player2.y2+=5;
-			if (player2.moveArray.indexOf("d") != -1)
+			if (player2.moveArray.indexOf("d") == -1){
 			player2.moveArray.push("d");
+}
 			break;
 		case 87:
 			//w key up
 			//player1.y1-=5;
 			//player1.y2-=5;
-			if (player1.moveArray.indexOf("u") != -1)
+			if (player1.moveArray.indexOf("u") == -1){
 			player1.moveArray.push("u");
+}
 			break;
 		case 83:
 			//s key down
 			//player1.y1+=5;
 			//player1.y2+=5;
-			if (player1.moveArray.indexOf("d") != -1)
-			player1.moveArray.push("d")
+			if (player1.moveArray.indexOf("d") == -1){
+			player1.moveArray.push("d");
+}
 			break;
 		default:
 			break;
