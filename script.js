@@ -4,20 +4,21 @@ var canvas = $('#gameCanvas')[0].getContext('2d');
 var width = $('#gameCanvas').width();
 var height = $('#gameCanvas').height();
 
+//timer
+var timer;
+
+//starts the game
+startTimer();
+
 //creates the ball
 var ball = new Ball(width/2,height/2, 5, 3);
 
 //array of players
 var paddles = [];
+
+//creates two new paddles on opposing sides of the field
 paddles.push(new Paddle(0, 10, height/2 - 30, height/2 + 30, 'red', 87, 83, prompt("Player 1 name?")));
 paddles.push(new Paddle(width-10, width, height/2 - 30, height/2 + 30, 'blue', 38, 40,  prompt("Player 2 name?")));
-
-//creates two new players at opposing sides of the field
-//var player1 = new Paddle(0, 10, height/2 - 30, height/2 + 30);
-//var player2 = new Paddle(width-10, width, height/2 - 30, height/2 + 30);
-
-
-
 
 //ball object that gets hit around the board by the paddles with hitbox
 function Ball(x, y, radius, speed){
@@ -179,30 +180,71 @@ function Paddle(x1, x2, y1, y2, color, upKeyCode, downKeyCode, name){
 	};
 };
 
-function tick(){
-
-	
-	//move the ball and check for collision with both paddles
-	
-if(typeof game_loop != "undefined") clearInterval(game_loop);
-		game_loop = setInterval(refreshCanvas, 25);
-	//refresh graphics
-	
+function startTimer(){
+	timer = setInterval(tick, 25);
 };
 
-tick();
+function stopTimer(){
+	clearInterval(timer);
+};
 
+//called every 25ms
+function tick(){
+	//move the ball
+	ball.move();
+	
+	//check for paddle collision
+	for (var index in paddles){
+		var paddle = paddles[index];
+		if (paddle.isColliding(ball)){
+			paddle.returnTrajectory(ball);
+			ball.incrementSpeed();
+		}
+	}
+
+	// paddle movement
+	for (var index in paddles){
+		var paddle = paddles[index];
+		for (var i in paddle.moveArray){
+			switch(paddle.moveArray[i]){
+				case 'u':
+					paddle.y1 -= 5;
+					paddle.y2 -= 5;
+					break;
+				case 'd':
+					paddle.y1 += 5;
+					paddle.y2 += 5;
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
+	//checks for wall collision
+	ball.wallCollision();
+
+	//refresh graphics
+	paint();
+};
+
+
+//clears canvas and redraws graphics
 function paint(){
+	//background
+	canvas.fillStyle = 'White';
+	canvas.fillRect(0,0,width,height);
+
+	//outline
+	canvas.fillStyle = 'black';
+	canvas.strokeRect(0,0,width,height);
+
 	//draw score
 	canvas.fillStyle = 'red';
 	//canvas.font = 'bold 16px Arial';
-	//canvas.fillText("Player 1" + player1.score
-
-
 	//loops through each player and draws them
 	for (var index in paddles){
 		var paddle = paddles[index];
-		//console.log(paddle);
 
 		//draws paddle
 		canvas.fillStyle = paddle.color;
@@ -212,14 +254,6 @@ function paint(){
 		canvas.font = '16 px Arial';
 		canvas.fillText(paddle.name + ": " + paddle.score, width / 2 - 10, 18 * index + 10);
 	}
-
-	//player 1
-	//canvas.fillStyle = 'red';
-	//canvas.fillRect(player1.x1,player1.y1,(player1.x2-player1.x1),(player1.y2-player1.y1));
-	
-	//player 2
-	//canvas.fillStyle = 'blue';
-	//canvas.fillRect(player2.x1,player2.y1,(player2.x2-player2.x1),(player2.y2-player2.y1));
 	
 	//draws ball
 	canvas.beginPath();
@@ -229,6 +263,7 @@ function paint(){
 	canvas.fill();
 };
 
+//unused, to be removed
 function refreshCanvas(){
 	
 	ball.move();
@@ -316,8 +351,7 @@ function refreshCanvas(){
 	}
 	*/
 	
-	canvas.fillStyle = 'White';
-	canvas.fillRect(0,0,width,height);
+	
 	
 	paint();
 };
