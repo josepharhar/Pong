@@ -35,13 +35,19 @@ function Ball(x, y, radius, speed){
 
 	//gets called every time the ball hits a paddle to make it go faster
 	this.incrementSpeed = function(){
-		if (this.speed < 8){
+		if (this.speed < 10){
 			this.speed++;
 		}
 	};
 
 	this.setDirection = function(direction){
-		//todo: make this compatible with more than 2pi and less than zero
+		//fixes the input if it it more than 2Pi or less than zero
+		while (direction >= 2 * Math.PI) {
+			direction = direction % (2 * Math.PI);
+		}
+		while (direction < 0){
+			direction = direction + (2 * Math.PI);
+		}
 		this.direction = direction;
 	};
 
@@ -68,13 +74,13 @@ function Ball(x, y, radius, speed){
 	//checks for collision with wall and chagnes direction as necessary
 	this.wallCollision = function(){
 
-		if (this.y < 0){
+		if (this.y - this.radius < 0){
 			//colliding with top wall
 			this.setDirection(2 * Math.PI - (this.direction % Math.PI));
-		} else if (this.y > height){
+		} else if (this.y + this.radius > height){
 			//colliding with bottom
 			this.setDirection(Math.PI - (this.direction % Math.PI));
-		} else if (this.x < 0){
+		} else if (this.x - this.radius < 0){
 			//colliding with left wall
 			//left player just lost
 			for (var index in paddles){
@@ -82,7 +88,7 @@ function Ball(x, y, radius, speed){
 			}
 			ball.reset();
 			paddles[1].score++;
-		} else if (this.x > width){
+		} else if (this.x + this.radius > width){
 			//colliding with right wall
 			//right player just lost
 			for (var index in paddles){
