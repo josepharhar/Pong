@@ -119,21 +119,7 @@ function Paddle(x1, x2, y1, y2, color, upKeyCode, downKeyCode, name){
 		return (!(ball.x - ball.radius > this.x2 ||
 				  ball.x + ball.radius < this.x1 ||
 				  ball.y - ball.radius > this.y2 ||
-				  ball.y + ball.radius < this.y1));
-
-		/*
-		if (ball.direction%(Math.PI*2) < (Math.PI/2)) {
-			return ((ball.x+ball.radius) > this.x1 &&
-		 		ball.y < this.y2 &&
-				ball.y > this.y1);
-		}
-		else {
-			return ((ball.x-ball.radius) < this.x2 &&
-		 		ball.y < this.y2 &&
-				ball.y > this.y1);
-		};
-		*/
-		
+				  ball.y + ball.radius < this.y1));		
 	};
 
 	//changes the direction of the ball during collision
@@ -263,7 +249,6 @@ function paint(){
 	
 	//draws ball
 	canvas.beginPath();
-	//(centerX, centerY, radius, 0, arc length, false)
 	canvas.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI, false);
 	canvas.fillStyle = 'black';
 	canvas.fill();
@@ -285,23 +270,6 @@ function refreshCanvas(){
 			console.log("not colliding");
 		}
 	}
-
-	/**
-	// if ball is moving right
-	if ((ball.direction+(Math.PI/2))%(Math.PI*2) < (Math.PI)) {
-		if (player2.isColliding(ball)){
-			player2.returnTrajectory(ball);
-			ball.speed+=1;
-		}
-	}
-	// if ball is moving left
-	else {
-		if (player1.isColliding(ball)){
-			player1.returnTrajectory(ball);
-			ball.speed+=1;
-		}
-	}
-	*/
 
 	//checks for collision with walls
 	ball.wallCollision();
@@ -326,39 +294,6 @@ function refreshCanvas(){
 		}
 	}
 
-	/**
-	for (var i in player1.moveArray){
-		switch(player1.moveArray[i]){
-			case "u": 
-				player1.y1 -= 5;
-				player1.y2 -= 5;
-				break;
-			case "d":
-				player1.y1 += 5;
-				player1.y2 += 5;
-				break;
-			default:
-				break;
-		}
-	}
-	for (var i in player2.moveArray){
-		switch(player2.moveArray[i]){
-			case "u": 
-				player2.y1 -= 5;
-				player2.y2 -= 5;
-				break;
-			case "d":
-				player2.y1 += 5;
-				player2.y2 += 5;
-				break;
-			default:
-				break;
-		}
-	}
-	*/
-	
-	
-	
 	paint();
 };
 
@@ -378,48 +313,6 @@ $(document).keydown(function(e){
 			}
 		}
 	}
-
-	/**
-	//switch statement to handle different keycodes
-	switch(e.which){
-		// w/s for player 1
-		// up/down for player 2
-		case 38:
-			//arrow key up
-			//player2.y1-=5;
-			//player2.y2-=5;
-			if (player2.moveArray.indexOf("u") == -1){
-			player2.moveArray.push("u");
-}
-			break;
-		case 40:
-			//arrow key down
-			//player2.y1+=5;
-			//player2.y2+=5;
-			if (player2.moveArray.indexOf("d") == -1){
-			player2.moveArray.push("d");
-}
-			break;
-		case 87:
-			//w key up
-			//player1.y1-=5;
-			//player1.y2-=5;
-			if (player1.moveArray.indexOf("u") == -1){
-			player1.moveArray.push("u");
-}
-			break;
-		case 83:
-			//s key down
-			//player1.y1+=5;
-			//player1.y2+=5;
-			if (player1.moveArray.indexOf("d") == -1){
-			player1.moveArray.push("d");
-}
-			break;
-		default:
-			break;
-	}
-	*/
 	
 });
 
@@ -435,32 +328,6 @@ $(document).keyup(function(e){
 			paddle.moveArray.splice(paddle.moveArray.indexOf('d'), 1);
 		}
 	}
-
-	/*
-	//switch statement to handle different keycodes
-	switch(e.which){
-		// w/s for player 1
-		// up/down for player 2
-		case 38:
-			//arrow key up
-			player2.moveArray.splice(player2.moveArray.indexOf("u"),1);
-			break;
-		case 40:
-			//arrow key down
-			player2.moveArray.splice(player2.moveArray.indexOf("d"),1);
-			break;
-		case 87:
-			//w key up
-			player1.moveArray.splice(player1.moveArray.indexOf("u"),1);
-			break;
-		case 83:
-			//s key down
-			player1.moveArray.splice(player1.moveArray.indexOf("d"),1);
-			break;
-		default:
-			break;
-	}
-	*/
 	
 });
 
