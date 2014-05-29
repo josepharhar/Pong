@@ -7,29 +7,50 @@ var height = $('#gameCanvas').height();
 //creates the ball
 var ball = new Ball(width/2,height/2, 5, 3);
 
+//array of players
+var paddles = [];
+paddles.push(new Paddle(0, 10, height/2 - 30, height/2 + 30, 'red', 87, 83, prompt("Player 1 name?")));
+paddles.push(new Paddle(width-10, width, height/2 - 30, height/2 + 30, 'blue', 38, 40,  prompt("Player 2 name?")));
+
 //creates two new players at opposing sides of the field
-var player1 = new Paddle(0, 10, height/2 - 30, height/2 + 30);
-var player2 = new Paddle(width-10, width, height/2 - 30, height/2 + 30);
+//var player1 = new Paddle(0, 10, height/2 - 30, height/2 + 30);
+//var player2 = new Paddle(width-10, width, height/2 - 30, height/2 + 30);
+
+
 
 
 //ball object that gets hit around the board by the paddles with hitbox
-function Ball(centerX, centerY, radius, speed){
-	this.X = centerX;
-	this.Y = centerY;
-	this.radius = radius;
-	this.speed = speed;
-	this.direction = 0; //represents direction the ball is traveling in radians
+function Ball(x, y, radius, speed){
+	//gets called when the game starts and when a point is scored
+	this.reset = function(){
+		this.x = x;
+		this.y = y;
+		this.radius = radius;
+		this.speed = speed;
+		this.direction = 0;
+	}
+
+	this.reset(); //initial call at the start of the game
+
+	//gets called every time the ball hits a paddle to make it go faster
+	this.incrementSpeed = function(){
+		if (this.speed < 8){
+			this.speed++;
+		}
+	};
+
 	this.setDirection = function(direction){
 		//todo: make this compatible with more than 2pi and less than zero
 		this.direction = direction;
 	};
+
 	//applies the speed and direction to the position
 	this.move = function(){
 		var dx = this.speed * Math.cos(this.direction);
 		var dy = this.speed * Math.sin(this.direction);
 
-		this.X += dx;
-		this.Y -= dy; //subtract because graphics start at top left corner
+		this.x += dx;
+		this.y -= dy; //subtract because graphics start at top left corner
 	};
 
 	//if the ball is moving to the right returns true, false for left
@@ -46,47 +67,78 @@ function Ball(centerX, centerY, radius, speed){
 	//checks for collision with wall and chagnes direction as necessary
 	this.wallCollision = function(){
 
-		if (this.Y < 0){
+		if (this.y < 0){
 			//colliding with top wall
 			this.setDirection(2 * Math.PI - (this.direction % Math.PI));
-		} else if (this.Y > height){
+		} else if (this.y > height){
 			//colliding with bottom
 			this.setDirection(Math.PI - (this.direction % Math.PI));
-		} else if (this.X < 0){
+		} else if (this.x < 0){
 			//colliding with left wall
 			//left player just lost
-		} else if (this.X > width){
+			for (var index in paddles){
+				paddles[index].reset();
+			}
+			ball.reset();
+			paddles[1].score++;
+		} else if (this.x > width){
 			//colliding with right wall
 			//right player just lost
+			for (var index in paddles){
+				paddles[index].reset();
+			}
+			ball.reset();
+			paddles[0].score++;
 		}
 	};
 };
 
 //new paddle object, represents the paddle that hits the ball which the player controls
 //four variables to represent each corner of the hitbox
-function Paddle(x1, x2, y1, y2){
-	this.x1 = x1;
-	this.x2 = x2;
-	this.y1 = y1;
-	this.y2 = y2;
-	this.moveArray = [];
+function Paddle(x1, x2, y1, y2, color, upKeyCode, downKeyCode, name){
+	this.color = color;
+	this.upKeyCode = upKeyCode;
+	this.downKeyCode = downKeyCode;
+	this.name = name; //represents player's name
+	this.score = 0;
+
+	//called when game starts and when a ball is scored
+	this.reset = function(){
+		this.x1 = x1;
+		this.x2 = x2;
+		this.y1 = y1;
+		this.y2 = y2;
+		this.moveArray = [];
+	};
+
+	this.reset(); //initial call at the start of the game
+
+	//gets a ball as an input and returns true if they are colliding
 	this.isColliding = function(ball){
+		return (!(ball.x > this.x2 ||
+				  ball.x < this.x1 ||
+				  ball.y > this.y2 ||
+				  ball.y < this.y1));
+
+		/*
 		if (ball.direction%(Math.PI*2) < (Math.PI/2)) {
-			return ((ball.X+ball.radius) > this.x1 &&
-		 		ball.Y < this.y2 &&
-				ball.Y > this.y1);
+			return ((ball.x+ball.radius) > this.x1 &&
+		 		ball.y < this.y2 &&
+				ball.y > this.y1);
 		}
 		else {
-			return ((ball.X-ball.radius) < this.x2 &&
-		 		ball.Y < this.y2 &&
-				ball.Y > this.y1);
+			return ((ball.x-ball.radius) < this.x2 &&
+		 		ball.y < this.y2 &&
+				ball.y > this.y1);
 		};
+		*/
 		
 	};
+
 	//changes the direction of the ball during collision
 	this.returnTrajectory = function(ball){
 		var center = (this.y1 + this.y2) / 2;
-		var ballcenter = ball.Y;
+		var ballcenter = ball.y;
 		var maxDifference = (this.y2 - this.y1);
 		var difference = center - ballcenter;
 
@@ -141,18 +193,38 @@ if(typeof game_loop != "undefined") clearInterval(game_loop);
 tick();
 
 function paint(){
-	//player 1
+	//draw score
 	canvas.fillStyle = 'red';
-	canvas.fillRect(player1.x1,player1.y1,(player1.x2-player1.x1),(player1.y2-player1.y1));
+	//canvas.font = 'bold 16px Arial';
+	//canvas.fillText("Player 1" + player1.score
+
+
+	//loops through each player and draws them
+	for (var index in paddles){
+		var paddle = paddles[index];
+		//console.log(paddle);
+
+		//draws paddle
+		canvas.fillStyle = paddle.color;
+		canvas.fillRect(paddle.x1, paddle.y1, (paddle.x2 - paddle.x1), (paddle.y2 - paddle.y1));
+
+		//draws score
+		canvas.font = '16 px Arial';
+		canvas.fillText(paddle.name + ": " + paddle.score, width / 2 - 10, 18 * index + 10);
+	}
+
+	//player 1
+	//canvas.fillStyle = 'red';
+	//canvas.fillRect(player1.x1,player1.y1,(player1.x2-player1.x1),(player1.y2-player1.y1));
 	
 	//player 2
-	canvas.fillStyle = 'blue';
-	canvas.fillRect(player2.x1,player2.y1,(player2.x2-player2.x1),(player2.y2-player2.y1));
+	//canvas.fillStyle = 'blue';
+	//canvas.fillRect(player2.x1,player2.y1,(player2.x2-player2.x1),(player2.y2-player2.y1));
 	
-	//ball
+	//draws ball
 	canvas.beginPath();
 	//(centerX, centerY, radius, 0, arc length, false)
-	canvas.arc(ball.X, ball.Y, ball.radius, 0, 2 * Math.PI, false);
+	canvas.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI, false);
 	canvas.fillStyle = 'black';
 	canvas.fill();
 };
@@ -160,6 +232,20 @@ function paint(){
 function refreshCanvas(){
 	
 	ball.move();
+
+	//loops through each paddle and each checks for collision
+	for (var index in paddles){
+		var paddle = paddles[index];
+		if (paddle.isColliding(ball)){
+			console.log("collided");
+			paddle.returnTrajectory(ball);
+			ball.incrementSpeed();
+		} else {
+			console.log("not colliding");
+		}
+	}
+
+	/**
 	// if ball is moving right
 	if ((ball.direction+(Math.PI/2))%(Math.PI*2) < (Math.PI)) {
 		if (player2.isColliding(ball)){
@@ -174,12 +260,32 @@ function refreshCanvas(){
 			ball.speed+=1;
 		}
 	}
+	*/
 
 	//checks for collision with walls
 	ball.wallCollision();
 
 
 	// paddle movement
+	for (var index in paddles){
+		var paddle = paddles[index];
+		for (var i in paddle.moveArray){
+			switch(paddle.moveArray[i]){
+				case 'u':
+					paddle.y1 -= 5;
+					paddle.y2 -= 5;
+					break;
+				case 'd':
+					paddle.y1 += 5;
+					paddle.y2 += 5;
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
+	/**
 	for (var i in player1.moveArray){
 		switch(player1.moveArray[i]){
 			case "u": 
@@ -208,6 +314,7 @@ function refreshCanvas(){
 				break;
 		}
 	}
+	*/
 	
 	canvas.fillStyle = 'White';
 	canvas.fillRect(0,0,width,height);
@@ -216,6 +323,23 @@ function refreshCanvas(){
 };
 
 $(document).keydown(function(e){
+	//loop to handle different keycodes
+	for (var index in paddles){
+		var paddle = paddles[index];
+		if (e.which === paddle.upKeyCode){
+			//moving up
+			if (paddle.moveArray.indexOf('u') === -1){
+				paddle.moveArray.push('u');
+			}
+		} else if (e.which === paddle.downKeyCode){
+			//moving down
+			if (paddle.moveArray.indexOf('d') === -1){
+				paddle.moveArray.push('d');
+			}
+		}
+	}
+
+	/**
 	//switch statement to handle different keycodes
 	switch(e.which){
 		// w/s for player 1
@@ -255,10 +379,24 @@ $(document).keydown(function(e){
 		default:
 			break;
 	}
+	*/
 	
 });
 
 $(document).keyup(function(e){
+	//loop to handle different keycodes
+	for (var index in paddles){
+		var paddle = paddles[index];
+		if (e.which === paddle.upKeyCode){
+			//up
+			paddle.moveArray.splice(paddle.moveArray.indexOf('u'), 1);
+		} else if (e.which === paddle.downKeyCode){
+			//down
+			paddle.moveArray.splice(paddle.moveArray.indexOf('d'), 1);
+		}
+	}
+
+	/*
 	//switch statement to handle different keycodes
 	switch(e.which){
 		// w/s for player 1
@@ -282,6 +420,7 @@ $(document).keyup(function(e){
 		default:
 			break;
 	}
+	*/
 	
 });
 
