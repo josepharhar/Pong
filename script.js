@@ -116,10 +116,10 @@ function Paddle(x1, x2, y1, y2, color, upKeyCode, downKeyCode, name){
 
 	//gets a ball as an input and returns true if they are colliding
 	this.isColliding = function(ball){
-		return (!(ball.x > this.x2 ||
-				  ball.x < this.x1 ||
-				  ball.y > this.y2 ||
-				  ball.y < this.y1));
+		return (!(ball.x - ball.radius > this.x2 ||
+				  ball.x + ball.radius < this.x1 ||
+				  ball.y - ball.radius > this.y2 ||
+				  ball.y + ball.radius < this.y1));
 
 		/*
 		if (ball.direction%(Math.PI*2) < (Math.PI/2)) {
@@ -208,12 +208,18 @@ function tick(){
 		for (var i in paddle.moveArray){
 			switch(paddle.moveArray[i]){
 				case 'u':
-					paddle.y1 -= 5;
-					paddle.y2 -= 5;
+					//prevents paddle from moving off the board
+					if (paddle.y1 > 0){
+						paddle.y1 -= 5;
+						paddle.y2 -= 5;
+					}
 					break;
 				case 'd':
-					paddle.y1 += 5;
-					paddle.y2 += 5;
+					//prevents paddle from moving off the board
+					if (paddle.y2 <= height){
+						paddle.y1 += 5;
+						paddle.y2 += 5;
+					}
 					break;
 				default:
 					break;
